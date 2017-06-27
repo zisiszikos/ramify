@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="description" content="Ramify example">
+        <title>Ramify asynchronous example</title>
+    </head>
+    <body>
+        <div id="main">
+        </div>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/bluebird/3.5.0/bluebird.min.js"></script>
+        <script src="../ramify.js"></script>
+        <script>
+            function myPromise (param) {
+
+                return new Promise(function (resolve) {
+
+                    resolve(param + 5);
+                });
+            }
+
+            var mytree = new Ramify();
+
+            mytree.add({
+                func1: function () {
+
+                    return this.call('func2', Math.round(Math.random() * 10), Promise.reject);
+                },
+                func2: function (param) {
+
+                    if (param > 8) {
+                        return this.call('func3', param * 2);
+                    } else if (param > 3) {
+                        return this.call('func4', param * 2);
+                    } else {
+                        throw new Error('Just an error!');
+                    }
+                },
+                func3: function (param) {
+
+                    return Promise.resolve('aaa: ' + param * 2);
+                },
+                func4: function (param) {
+
+                    return this.call('func5', myPromise(param).delay(600));
+                },
+                func5: function (param) {
+
+                    return this.call('func6', myPromise(param).delay(600));
+                },
+                func6: function (param) {
+
+                    return Promise.resolve('bbb: ' + param * 3);
+                }
+            }).catch(Promise.reject);
+
+            var result = mytree.call('func1');
+
+            result.then(function (result) {
+
+                document.querySelector('#main').innerHTML = result;
+            }).catch(Ramify.Error, function (err) {
+
+                console.log('RamifyError');
+                console.log(err.stack);
+            }).catch(function (err) {
+
+                console.log(err.stack);
+            });
+        </script>
+    </body>
+</html>

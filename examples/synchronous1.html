@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="description" content="Ramify example">
+        <title>Ramify synchronous example</title>
+    </head>
+    <body>
+        <div id="main">
+        </div>
+        <script src="../ramify.js"></script>
+        <script>
+            var mytree = new Ramify();
+
+            mytree.add({
+                one: function () {
+
+                    this.call('two', Math.round(Math.random() * 10));
+                },
+                two: function (param) {
+
+                    if (param > 8) {
+                        this.call('three', param * 2);
+                    } else if (param > 3) {
+                        this.call('four', param * 2);
+                    } else {
+                        throw new Error('Just an error!');
+                    }
+                },
+                three: function (param) {
+
+                    document.querySelector('#main').innerHTML = 'Three: ' + param * 2;
+                },
+                four: function (param) {
+
+                    document.querySelector('#main').innerHTML = 'Four: ' + param * 3;
+                }
+            }).catch(function (err) {
+
+                console.log(err);
+            }).call('one');
+        </script>
+    </body>
+</html>
