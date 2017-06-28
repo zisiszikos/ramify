@@ -76,7 +76,7 @@
         }
     }
 
-    Ramify.version = '0.1.0';
+    Ramify.version = '0.1.5';
     Ramify.author = 'Zisis Zikos';
 
     Ramify.Error = RamifyError;
