@@ -1,7 +1,7 @@
 {
   "name": "ramify",
   "description": "Ramify provides a way to create complex paths of functions and promises for easier handling the different scenarios in a chain of actions",
-  "main": "ramify.js",
+  "main": "dist/ramify.js",
   "authors": [
     "Zisis Zikos"
   ],
