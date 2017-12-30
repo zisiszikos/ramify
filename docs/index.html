@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Home - Documentation</title>
+
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav>
+    <li class="nav-link nav-home-link"><a href="index.html">Home</a></li><li class="nav-heading">Classes</li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="Ramify.html">Ramify</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Ramify.html#addRami">addRami</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Ramify.html#addRamus">addRamus</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Ramify.html#call">call</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Ramify.html#catch">catch</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Ramify.html#setRamusContent">setRamusContent</a></span></li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="Ramify.RamifyError.html">RamifyError</a></span></li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="Ramify-Rami.html">Rami</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Ramify-Rami.html#call">call</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Ramify-Rami.html#prop">prop</a></span></li>
+</nav>
+
+<div id="main">
+    
+
+    
+
+
+
+    
+
+
+
+
+
+
+
+
+
+    
+
+
+    <section class="readme">
+        <article><h1>Ramify</h1><blockquote>
+<p>Unchain promises</p>
+</blockquote>
+<p>Ramify is a lightweight library with zero dependencies which provides a simple way to create complex paths of functions and promises for easier handling the different scenarios that can happen in a chain of actions.</p>
+<p>It supports both browser and Node.js environments. At a browser it exposes a global variable, <code>Ramify</code>.</p>
+<hr>
+<blockquote>
+<p><strong>Attention</strong>: The Ramify package is still in beta. Breaking changes may be introduced at any point. Use carefully.</p>
+</blockquote>
+<hr>
+<h3>Installation and usage</h3><p>Using <a href="https://www.npmjs.org/">npm</a>:</p>
+<pre class="prettyprint source"><code>npm install --save ramify
+
+var Ramify = require('ramify');
+var myController = new Ramify();</code></pre><p>Using <a href="http://bower.io/">Bower</a>:</p>
+<pre class="prettyprint source"><code>bower install --save ramify
+
+&lt;script src=&quot;dist/ramify.js&quot;>&lt;/script>
+&lt;script type=&quot;text/javascript&quot;>
+    var myController = new Ramify();
+&lt;/script></code></pre><hr>
+<h3><a href="http://zisiszikos.github.io/ramify">API documentation</a></h3><hr>
+<h3>Examples</h3><p><strong>Simple synchronous example</strong></p>
+<pre class="prettyprint source lang-javascript"><code>var myController = new Ramify();
+
+myController.addRami({
+    one: function () {
+
+        this.call('two', Math.round(Math.random() * 10));
+    },
+    two: function (param) {
+
+        if (param > 8) {
+            this.call('three', param * 2);
+        } else if (param > 3) {
+            this.call('four', param * 2);
+        } else {
+            throw new Error('Just an error!');
+        }
+    },
+    three: function (param) {
+
+        document.querySelector('#main').innerHTML = 'Three: ' + param * 2;
+    },
+    four: function (param) {
+
+        document.querySelector('#main').innerHTML = 'Four: ' + param * 3;
+    }
+}).catch(function (err) {
+
+    console.log(err);
+}).call('one');</code></pre><p><strong>Asynchronous example</strong></p>
+<pre class="prettyprint source lang-javascript"><code>function myPromise (param) {
+
+    return new Promise(function (resolve) {
+
+        resolve(param + 5);
+    });
+}
+
+var myController = new Ramify();
+
+myController.addRami({
+    func1: function () {
+
+        return this.call('func2', Math.round(Math.random() * 10), Promise.reject);
+    },
+    func2: function (param) {
+
+        if (param > 8) {
+            return this.call('func3', param * 2);
+        } else if (param > 3) {
+            return this.call('func4', param * 2);
+        } else {
+            throw new Error('Just an error!');
+        }
+    },
+    func3: function (param) {
+
+        return Promise.resolve('aaa: ' + param * 2);
+    },
+    func4: function (param) {
+
+        return this.call('func5', myPromise(param).delay(600));
+    },
+    func5: function (param) {
+
+        return this.call('func6', myPromise(param).delay(600));
+    },
+    func6: function (param) {
+
+        return Promise.resolve('bbb: ' + param * 3);
+    }
+}).catch(Promise.reject);
+
+var result = myController.call('func1');
+
+result.then(function (result) {
+
+    document.querySelector('#main').innerHTML = result;
+}).catch(Ramify.RamifyError, function (err) {
+
+    console.log('RamifyError');
+    console.log(err.stack);
+}).catch(function (err) {
+
+    console.log(err.stack);
+});</code></pre><p><strong>More complex asynchronous example</strong></p>
+<pre class="prettyprint source lang-javascript"><code>var shopsService = new Ramify();
+var rami = {};
+
+function _findShop (name) {
+
+    return new Promise(function (resolve, reject) {
+
+        var temp = Math.random();
+        if (temp > 0.7) {
+            // could not find shop with this name
+            resolve([]);
+        } else if (temp > 0.4) {
+            // shop found
+            resolve([{
+                id: '765454654565',
+                name: name
+            }]);
+        } else {
+            // An error occured while fetching from db
+            reject(new Error('Something went wrong!'));
+        }
+    });
+}
+
+function _createShop (name) {
+
+    return new Promise(function (resolve) {
+
+        // create shop and return it
+        resolve({
+            id: '12342432423',
+            name: name
+        });
+    });
+}
+
+rami.findOrCreateShop = function (shopName) {
+
+    console.log('- Trying to find the shop');
+    this.prop('shopName', shopName);
+
+    var count = this.prop('count');
+    this.prop('count', Number.isInteger(count) ? count + 1 : 1);
+
+    console.log('Trying to find the shop. Try: ' + this.prop('count'));
+    return this.call('handleFindShopResponse', _findShop(shopName),
+        function errorHandler(err) {
+
+            if (err instanceof Ramify.RamifyError) {
+                throw err;
+            }
+            console.log(err.message);
+            if (this.prop('count') &lt; 3) {
+                return this.call('findOrCreateShop', this.prop('shopName'));
+            } else {
+                throw new Error('Retry limit reached.');
+            }
+        });
+};
+
+rami.handleFindShopResponse = function (shops) {
+
+    console.log('Shop found after ' + this.prop('count') + ' tries');
+    if (shops.length > 0) {
+        console.log('- Shop found');
+        return this.call('constructResponse', shops[0]);
+    } else {
+        console.log('- Couldn\'t find shop, creating one');
+        return this.call('handleCreateShopResponse', _createShop(this.prop('shopName')));
+    }
+};
+
+rami.handleCreateShopResponse = function (newShop) {
+
+    console.log('- Shop created');
+    return this.call('constructResponse', newShop);
+};
+
+rami.constructResponse = function (shop) {
+
+    console.log('- Returning the shop');
+    shop.website = 'https://' + shop.name;
+
+    return shop;
+};
+
+shopsService.addRami(rami).catch(Promise.reject);
+
+shopsService.call('findOrCreateShop', 'myshop.com')
+    .then(function (shop) {
+
+        document.querySelector('#main').innerHTML = JSON.stringify(shop);
+    }).catch(Ramify.RamifyError, function (err) {
+
+        console.log('+++++ Ramify Error +++++');
+        console.log(err.stack);
+    }).catch(function (err) {
+
+        console.log('+++++ General Error +++++');
+        console.log(err.stack);
+    });</code></pre></article>
+    </section>
+
+
+
+
+
+
+</div>
+
+<br class="clear">
+
+<footer>
+    Generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Sat Dec 30 2017 04:28:40 GMT+0200 (EET) using the Minami theme.
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/linenumber.js"></script>
+</body>
+</html>

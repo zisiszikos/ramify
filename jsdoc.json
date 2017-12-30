@@ -1,0 +1,16 @@
+{
+    "plugins": ["plugins/markdown"],
+    "source": {
+        "include": ["ramify.js", "README.md"]
+    },
+    "opts": {
+        "destination": "docs",
+        "verbose": true,
+        "template": "node_modules/minami"
+    },
+    "templates": {
+        "default": {
+            "outputSourceFiles": false
+        }
+    }
+}
