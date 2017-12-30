@@ -1,6 +1,6 @@
 {
   "name": "ramify",
-  "version": "0.1.5",
+  "version": "0.2.0",
   "description": "Ramify is a lightweight library with zero dependencies which provides a simple way to create complex paths of functions and promises for easier handling the different scenarios that can happen in a chain of actions.",
   "main": "dist/ramify.js",
   "scripts": {
