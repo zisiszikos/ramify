@@ -7,6 +7,9 @@ Ramify is a lightweight library with zero dependencies which provides a simple w
 It supports both browser and Node.js environments. At a browser it exposes a global variable, `Ramify`.
 
 ---
+> **Attention**: The Ramify package is still in beta. Breaking changes may be introduced at any point. Use carefully.
+
+---
 
 ### Installation and usage
 
@@ -15,7 +18,8 @@ Using [npm](https://www.npmjs.org/):
 ```
 npm install --save ramify
 
-var ramify = require('ramify');
+var Ramify = require('ramify');
+var myController = new Ramify();
 ```
 
 Using [Bower](http://bower.io/):
@@ -23,100 +27,214 @@ Using [Bower](http://bower.io/):
 ```
 bower install --save ramify
 
-var ramify = new Ramify();
+<script src="dist/ramify.js"></script>
+<script type="text/javascript">
+    var myController = new Ramify();
+</script>
 ```
 
 ---
 
-### API documentation
+### [API documentation](http://zisiszikos.github.io/ramify)
+---
 
-#### Ramify.add(Rami)
-Adds the functions to the Ramify instance that will be used within it.
-##### `Rami`: Object
-The Object that contains the functions as Object properties.
+### Examples
+
+**Simple synchronous example**
+
 ```javascript
-var ramify = new Ramify();
-ramify.add({
-    someFunction: () {
-        /* do something */
+var myController = new Ramify();
+
+myController.addRami({
+    one: function () {
+
+        this.call('two', Math.round(Math.random() * 10));
     },
-    someOtherFunction: () {
-        /* do something else */
+    two: function (param) {
+
+        if (param > 8) {
+            this.call('three', param * 2);
+        } else if (param > 3) {
+            this.call('four', param * 2);
+        } else {
+            throw new Error('Just an error!');
+        }
+    },
+    three: function (param) {
+
+        document.querySelector('#main').innerHTML = 'Three: ' + param * 2;
+    },
+    four: function (param) {
+
+        document.querySelector('#main').innerHTML = 'Four: ' + param * 3;
     }
-});
+}).catch(function (err) {
+
+    console.log(err);
+}).call('one');
 ```
 
-#### Ramify.call(functionName \[, passedParameter, errorHandler\])
-Calls a previous declared function and optionally pass a parameter (some value or a promise) and an error handler for the errors thrown within the promise that was called. `call` can be used either from the Ramify instance or from `this` Object inside the declared functions.
-##### `functionName`: String
-The name of the function to be called.
-##### `passedParameter`: Any
-The value the will be applied as a parameter to the called function. Could be any value, even a Promise. If a Promise is passed, the Promise will be automatically evaluated and the resolved value will be passed as a parameter, otherwise the rejected value will be passed to the error handle function. If no error handle function is declared, the generic error handle function will be called.
-##### `errorHandler`: Function
-A function that will handle the errors that can happen at a Promise that is passed as a parameter.
+**Asynchronous example**
 ```javascript
-var ramify = new Ramify();
-function somePromise () {
-    return new Promise(function (resolve, reject) {
-        resolve('someValue');
+function myPromise (param) {
+
+    return new Promise(function (resolve) {
+
+        resolve(param + 5);
     });
 }
-ramify.add({
-    someFunction: () {
-        this.call('someOtherFunction', somePromise(), function (err) {
-            console.log(err);
-        });
+
+var myController = new Ramify();
+
+myController.addRami({
+    func1: function () {
+
+        return this.call('func2', Math.round(Math.random() * 10), Promise.reject);
     },
-    someOtherFunction: (value) {
-        this.call('endFunction', value + '123');
+    func2: function (param) {
+
+        if (param > 8) {
+            return this.call('func3', param * 2);
+        } else if (param > 3) {
+            return this.call('func4', param * 2);
+        } else {
+            throw new Error('Just an error!');
+        }
     },
-    endFunction: function (value) {
-        return value;
+    func3: function (param) {
+
+        return Promise.resolve('aaa: ' + param * 2);
+    },
+    func4: function (param) {
+
+        return this.call('func5', myPromise(param).delay(600));
+    },
+    func5: function (param) {
+
+        return this.call('func6', myPromise(param).delay(600));
+    },
+    func6: function (param) {
+
+        return Promise.resolve('bbb: ' + param * 3);
     }
+}).catch(Promise.reject);
+
+var result = myController.call('func1');
+
+result.then(function (result) {
+
+    document.querySelector('#main').innerHTML = result;
+}).catch(Ramify.RamifyError, function (err) {
+
+    console.log('RamifyError');
+    console.log(err.stack);
+}).catch(function (err) {
+
+    console.log(err.stack);
 });
-ramify.call('someFunction');
 ```
 
-#### Ramify.catch(generalErrorHandler)
-When used, it will handle all the errors that were not caught at the specific error handlers.
-##### `generalErrorHandler`: Function
-The general error handle function.
+**More complex asynchronous example**
 ```javascript
-var ramify = new Ramify();
-ramify.add(Rami).catch(Promise.reject);
-ramify.call('someFunction', 'someValue')
-    .then(function () {
-        /* do something */
-    }).catch(Ramify.Error, function (err) {
+var shopsService = new Ramify();
+var rami = {};
 
-        console.log('+++++ Ramify Error Handler +++++');
+function _findShop (name) {
+
+    return new Promise(function (resolve, reject) {
+
+        var temp = Math.random();
+        if (temp > 0.7) {
+            // could not find shop with this name
+            resolve([]);
+        } else if (temp > 0.4) {
+            // shop found
+            resolve([{
+                id: '765454654565',
+                name: name
+            }]);
+        } else {
+            // An error occured while fetching from db
+            reject(new Error('Something went wrong!'));
+        }
+    });
+}
+
+function _createShop (name) {
+
+    return new Promise(function (resolve) {
+
+        // create shop and return it
+        resolve({
+            id: '12342432423',
+            name: name
+        });
+    });
+}
+
+rami.findOrCreateShop = function (shopName) {
+
+    console.log('- Trying to find the shop');
+    this.prop('shopName', shopName);
+
+    var count = this.prop('count');
+    this.prop('count', Number.isInteger(count) ? count + 1 : 1);
+
+    console.log('Trying to find the shop. Try: ' + this.prop('count'));
+    return this.call('handleFindShopResponse', _findShop(shopName),
+        function errorHandler(err) {
+
+            if (err instanceof Ramify.RamifyError) {
+                throw err;
+            }
+            console.log(err.message);
+            if (this.prop('count') < 3) {
+                return this.call('findOrCreateShop', this.prop('shopName'));
+            } else {
+                throw new Error('Retry limit reached.');
+            }
+        });
+};
+
+rami.handleFindShopResponse = function (shops) {
+
+    console.log('Shop found after ' + this.prop('count') + ' tries');
+    if (shops.length > 0) {
+        console.log('- Shop found');
+        return this.call('constructResponse', shops[0]);
+    } else {
+        console.log('- Couldn\'t find shop, creating one');
+        return this.call('handleCreateShopResponse', _createShop(this.prop('shopName')));
+    }
+};
+
+rami.handleCreateShopResponse = function (newShop) {
+
+    console.log('- Shop created');
+    return this.call('constructResponse', newShop);
+};
+
+rami.constructResponse = function (shop) {
+
+    console.log('- Returning the shop');
+    shop.website = 'https://' + shop.name;
+
+    return shop;
+};
+
+shopsService.addRami(rami).catch(Promise.reject);
+
+shopsService.call('findOrCreateShop', 'myshop.com')
+    .then(function (shop) {
+
+        document.querySelector('#main').innerHTML = JSON.stringify(shop);
+    }).catch(Ramify.RamifyError, function (err) {
+
+        console.log('+++++ Ramify Error +++++');
         console.log(err.stack);
     }).catch(function (err) {
 
-        console.log('+++++ General Error Handler +++++');
+        console.log('+++++ General Error +++++');
         console.log(err.stack);
     });
 ```
-
-#### this.prop(propertyName \[, propertyValue\])
-Attached to `this` of a function declared within Ramify instance, either to get or set a property.
-##### `propertyName`: String
-The name of the property to get or set.
-##### `propertyValue`: Any
-The property value to be set.
-```javascript
-var ramify = new Ramify();
-ramify.add({
-    someFunction: () {
-        this.prop('someProp', 'someValue');
-        /* do something */
-    },
-    someOtherFunction: () {
-        var v = this.prop('someProp');
-        /* do something else */
-    }
-});
-```
----
-
-### [Examples](examples)

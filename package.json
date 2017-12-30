@@ -4,7 +4,8 @@
   "description": "Ramify is a lightweight library with zero dependencies which provides a simple way to create complex paths of functions and promises for easier handling the different scenarios that can happen in a chain of actions.",
   "main": "dist/ramify.js",
   "scripts": {
-    "build": "node_modules/.bin/uglifyjs ramify.js -o dist/ramify.js"
+    "build": "node_modules/.bin/uglifyjs ramify.js -o dist/ramify.js",
+    "docs": "node_modules/.bin/jsdoc -c jsdoc.json"
   },
   "files": [],
   "repository": {
@@ -14,6 +15,8 @@
   "author": "Zisis Zikos",
   "license": "ISC",
   "devDependencies": {
+    "jsdoc": "3.5.5",
+    "minami": "^1.2.3",
     "uglify-js": "3.3.3"
   }
 }
