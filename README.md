@@ -1,4 +1,4 @@
-# Ramify
+# [Ramify](https://github.com/zisiszikos/ramify)
 
 > Unchain promises
 

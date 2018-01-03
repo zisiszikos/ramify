@@ -177,6 +177,14 @@
     Ramify.RamifyError = RamifyError;
 
     /**
+     * A reference to internal `this` object.
+     * @member {Ramify~Rami} context
+     * @memberof Ramify
+     * @instance
+     */
+    Ramify.prototype.context = _this;
+
+    /**
      * The Ramify instance configuration.
      * @member {Object} config
      * @memberof Ramify
@@ -188,12 +196,12 @@
 
     /**
      * Adds functions to the Ramify instance that will be used within it.
-     * @function Ramify#addRami
+     * @function Ramify#addAll
      * @param {!Object} rami The Object that contains the functions as Object properties.
      * @returns {Ramify} The instance of current Ramify object.
      * @example
      * var myController = new Ramify();
-     * myController.addRami({
+     * myController.addAll({
      *     someRamus: function () {
      *         // do something
      *     },
@@ -203,7 +211,7 @@
      *     anotherRamus: 'foo'
      * });
      */
-    Ramify.prototype.addRami = function(rami) {
+    Ramify.prototype.addAll = function(rami) {
         if (rami !== null && typeof rami === 'object') {
             _rami = _rami || {};
             var keysCount = Object.keys(rami).length;
@@ -222,19 +230,19 @@
 
     /**
      * Adds a function to the Ramify instance that will be used within it.
-     * @function Ramify#addRamus
+     * @function Ramify#add
      * @param {!string} ramusName The name of the ramus.
      * @param {*} [ramusContent] The content of the current ramus.
      * @returns {Ramify} The instance of current Ramify object.
      * @example
      * var myController = new Ramify();
-     * myController.addRamus('aRamusName', function () {
+     * myController.add('aRamusName', function () {
      *     // do something
      * });
-     * myController.addRamus('anotherRamusName', 'someValue');
-     * myController.addRamus('someOtherRamusName');
+     * myController.add('anotherRamusName', 'someValue');
+     * myController.add('someOtherRamusName');
      */
-    Ramify.prototype.addRamus = function(ramusName, ramusContent) {
+    Ramify.prototype.add = function(ramusName, ramusContent) {
         if (!ramusName) {
             if (typeof _generalErrorHandler === 'function') {
                 return _generalErrorHandler.call(this, new RamifyError('Ramus name is not specified.'));
@@ -256,18 +264,18 @@
 
     /**
      * Sets the content of a ramus.
-     * @function Ramify#setRamusContent
+     * @function Ramify#setContent
      * @param {!string} ramusName The name of the ramus.
      * @param {*} [ramusContent] The content of the current ramus.
      * @returns {Ramify} The instance of current Ramify object.
      * @example
      * var myController = new Ramify();
-     * myController.setRamusContent('aRamusName', function () {
+     * myController.setContent('aRamusName', function () {
      *     // do something
      * });
-     * myController.setRamusContent('anotherRamusName', 'someValue');
+     * myController.setContent('anotherRamusName', 'someValue');
      */
-    Ramify.prototype.setRamusContent = function(ramusName, ramusContent) {
+    Ramify.prototype.setContent = function(ramusName, ramusContent) {
         if (!ramusName) {
             if (typeof _generalErrorHandler === 'function') {
                 return _generalErrorHandler.call(this, new RamifyError('Ramus name is not specified.'));
@@ -291,6 +299,40 @@
         _rami[ramusName] = ramusContent;
 
         return this;
+    };
+
+    /**
+     * Gets the content of a ramus.
+     * @function Ramify#getContent
+     * @param {!string} ramusName The name of the ramus.
+     * @returns {*} The content of the current ramus.
+     * @example
+     * var myController = new Ramify();
+     * var content = myController.getContent('aRamusName');
+     */
+    Ramify.prototype.getContent = function(ramusName) {
+        if (!ramusName) {
+            if (typeof _generalErrorHandler === 'function') {
+                return _generalErrorHandler.call(this, new RamifyError('Ramus name is not specified.'));
+            } else {
+                throw new RamifyError('Ramus name is not specified.');
+            }
+            return this;
+        }
+
+        _rami = _rami || {};
+        var ramusContent = _rami[ramusName];
+
+        if (!ramusContent) {
+            if (typeof _generalErrorHandler === 'function') {
+                return _generalErrorHandler.call(this, new RamifyError('Given ramus name is not defined.'));
+            } else {
+                throw new RamifyError('Given ramus name is not defined.');
+            }
+            return this;
+        }
+
+        return ramusContent;
     };
 
     /**

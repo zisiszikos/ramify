@@ -1,22 +1,23 @@
 {
-  "name": "ramify",
-  "version": "0.2.0",
-  "description": "Ramify is a lightweight library with zero dependencies which provides a simple way to create complex paths of functions and promises for easier handling the different scenarios that can happen in a chain of actions.",
-  "main": "dist/ramify.js",
-  "scripts": {
-    "build": "node_modules/.bin/uglifyjs ramify.js -o dist/ramify.js",
-    "docs": "node_modules/.bin/jsdoc -c jsdoc.json"
-  },
-  "files": [],
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/zisiszikos/ramify.git"
-  },
-  "author": "Zisis Zikos",
-  "license": "ISC",
-  "devDependencies": {
-    "jsdoc": "3.5.5",
-    "minami": "^1.2.3",
-    "uglify-js": "3.3.3"
-  }
+    "name": "ramify",
+    "version": "0.2.0",
+    "description":
+        "Ramify is a lightweight library with zero dependencies which provides a simple way to create complex paths of functions and promises for easier handling the different scenarios that can happen in a chain of actions.",
+    "main": "ramify.js",
+    "scripts": {
+        "build": "node_modules/.bin/uglifyjs ramify.js -o dist/ramify.min.js -c -m reserved=['Ramify','Rami']",
+        "docs": "node_modules/.bin/jsdoc -c jsdoc.json"
+    },
+    "files": ["dist/ramify.min.js"],
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/zisiszikos/ramify.git"
+    },
+    "author": "Zisis Zikos",
+    "license": "ISC",
+    "devDependencies": {
+        "jsdoc": "3.5.5",
+        "minami": "1.2.3",
+        "uglify-js": "3.3.3"
+    }
 }
