@@ -51,7 +51,8 @@
     var _generalErrorHandler = null;
     var _returnValue = null;
     var _config = {
-        createAlias: false
+        createAlias: false,
+        safeAlias: true
     };
     var _this = null;
     var _properties = {};
@@ -151,7 +152,7 @@
             var keysCount = Object.keys(this.config).length;
             for (var i = 0; i < keysCount; i++) {
                 var configName = Object.keys(this.config)[i];
-                if (config[configName] && typeof this.config[configName] === typeof config[configName]) {
+                if (typeof this.config[configName] === typeof config[configName]) {
                     this.config[configName] = config[configName];
                 }
             }
@@ -164,7 +165,7 @@
      * @memberof Ramify
      * @static
      */
-    Ramify.version = '0.2.0';
+    Ramify.version = '0.3.0';
 
     /**
      * Returns the author of Ramify package.
@@ -177,23 +178,36 @@
     Ramify.RamifyError = RamifyError;
 
     /**
+     * A reference to internal `this` object.
+     * @member {Ramify~Rami} context
+     * @memberof Ramify
+     * @instance
+     */
+    Ramify.prototype.context = _this;
+
+    /**
      * The Ramify instance configuration.
      * @member {Object} config
      * @memberof Ramify
      * @instance
      * @property {boolean} createAlias=false Whether alias methods should be
-     * created for every ramus, at the inner Rami object.
+     * created for every ramus, at the inner Rami object. **Note:** Alias methods
+     * are dangerous because calling a method that doesn't exists will result
+     * in an unhandled exception. Instead, the `.call` method handles this kind
+     * of errors.
+     * @property {boolean} safeAlias=true Whether alias methods should be
+     * prepended with an underscore for safety (not overwriting existing methods).
      */
     Ramify.prototype.config = _config;
 
     /**
      * Adds functions to the Ramify instance that will be used within it.
-     * @function Ramify#addRami
+     * @function Ramify#addAll
      * @param {!Object} rami The Object that contains the functions as Object properties.
      * @returns {Ramify} The instance of current Ramify object.
      * @example
      * var myController = new Ramify();
-     * myController.addRami({
+     * myController.addAll({
      *     someRamus: function () {
      *         // do something
      *     },
@@ -203,7 +217,7 @@
      *     anotherRamus: 'foo'
      * });
      */
-    Ramify.prototype.addRami = function(rami) {
+    Ramify.prototype.addAll = function(rami) {
         if (rami !== null && typeof rami === 'object') {
             _rami = _rami || {};
             var keysCount = Object.keys(rami).length;
@@ -211,8 +225,9 @@
                 var ramusName = Object.keys(rami)[i];
                 _rami[ramusName] = rami[ramusName];
                 if (this.config.createAlias) {
-                    Rami.prototype['_' + ramusName] = _call.bind(_this, ramusName);
-                    Ramify.prototype['_' + ramusName] = _call.bind(_this, ramusName);
+                    var properyName = this.config.safeAlias ? '_' + ramusName : ramusName;
+                    Rami.prototype[properyName] = _call.bind(_this, ramusName);
+                    Ramify.prototype[properyName] = _call.bind(_this, ramusName);
                 }
             }
         }
@@ -222,19 +237,19 @@
 
     /**
      * Adds a function to the Ramify instance that will be used within it.
-     * @function Ramify#addRamus
+     * @function Ramify#add
      * @param {!string} ramusName The name of the ramus.
      * @param {*} [ramusContent] The content of the current ramus.
      * @returns {Ramify} The instance of current Ramify object.
      * @example
      * var myController = new Ramify();
-     * myController.addRamus('aRamusName', function () {
+     * myController.add('aRamusName', function () {
      *     // do something
      * });
-     * myController.addRamus('anotherRamusName', 'someValue');
-     * myController.addRamus('someOtherRamusName');
+     * myController.add('anotherRamusName', 'someValue');
+     * myController.add('someOtherRamusName');
      */
-    Ramify.prototype.addRamus = function(ramusName, ramusContent) {
+    Ramify.prototype.add = function(ramusName, ramusContent) {
         if (!ramusName) {
             if (typeof _generalErrorHandler === 'function') {
                 return _generalErrorHandler.call(this, new RamifyError('Ramus name is not specified.'));
@@ -247,8 +262,9 @@
         _rami = _rami || {};
         _rami[ramusName] = ramusContent;
         if (this.config.createAlias) {
-            Rami.prototype['_' + ramusName] = _call.bind(_this, ramusName);
-            Ramify.prototype['_' + ramusName] = _call.bind(_this, ramusName);
+            var properyName = this.config.safeAlias ? '_' + ramusName : ramusName;
+            Rami.prototype[properyName] = _call.bind(_this, ramusName);
+            Ramify.prototype[properyName] = _call.bind(_this, ramusName);
         }
 
         return this;
@@ -256,18 +272,18 @@
 
     /**
      * Sets the content of a ramus.
-     * @function Ramify#setRamusContent
+     * @function Ramify#setContent
      * @param {!string} ramusName The name of the ramus.
      * @param {*} [ramusContent] The content of the current ramus.
      * @returns {Ramify} The instance of current Ramify object.
      * @example
      * var myController = new Ramify();
-     * myController.setRamusContent('aRamusName', function () {
+     * myController.setContent('aRamusName', function () {
      *     // do something
      * });
-     * myController.setRamusContent('anotherRamusName', 'someValue');
+     * myController.setContent('anotherRamusName', 'someValue');
      */
-    Ramify.prototype.setRamusContent = function(ramusName, ramusContent) {
+    Ramify.prototype.setContent = function(ramusName, ramusContent) {
         if (!ramusName) {
             if (typeof _generalErrorHandler === 'function') {
                 return _generalErrorHandler.call(this, new RamifyError('Ramus name is not specified.'));
@@ -291,6 +307,40 @@
         _rami[ramusName] = ramusContent;
 
         return this;
+    };
+
+    /**
+     * Gets the content of a ramus.
+     * @function Ramify#getContent
+     * @param {!string} ramusName The name of the ramus.
+     * @returns {*} The content of the current ramus.
+     * @example
+     * var myController = new Ramify();
+     * var content = myController.getContent('aRamusName');
+     */
+    Ramify.prototype.getContent = function(ramusName) {
+        if (!ramusName) {
+            if (typeof _generalErrorHandler === 'function') {
+                return _generalErrorHandler.call(this, new RamifyError('Ramus name is not specified.'));
+            } else {
+                throw new RamifyError('Ramus name is not specified.');
+            }
+            return this;
+        }
+
+        _rami = _rami || {};
+        var ramusContent = _rami[ramusName];
+
+        if (!ramusContent) {
+            if (typeof _generalErrorHandler === 'function') {
+                return _generalErrorHandler.call(this, new RamifyError('Given ramus name is not defined.'));
+            } else {
+                throw new RamifyError('Given ramus name is not defined.');
+            }
+            return this;
+        }
+
+        return ramusContent;
     };
 
     /**
