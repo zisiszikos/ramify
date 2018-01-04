@@ -45,7 +45,7 @@ bower install --save ramify
 ```javascript
 var myController = new Ramify();
 
-myController.addRami({
+myController.addAll({
     one: function () {
 
         this.call('two', Math.round(Math.random() * 10));
@@ -86,7 +86,7 @@ function myPromise (param) {
 
 var myController = new Ramify();
 
-myController.addRami({
+myController.addAll({
     func1: function () {
 
         return this.call('func2', Math.round(Math.random() * 10), Promise.reject);
@@ -222,7 +222,7 @@ rami.constructResponse = function (shop) {
     return shop;
 };
 
-shopsService.addRami(rami).catch(Promise.reject);
+shopsService.addAll(rami).catch(Promise.reject);
 
 shopsService.call('findOrCreateShop', 'myshop.com')
     .then(function (shop) {
