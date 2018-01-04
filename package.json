@@ -6,7 +6,7 @@
     "main": "ramify.js",
     "scripts": {
         "build": "node_modules/.bin/uglifyjs ramify.js -o dist/ramify.min.js -c -m reserved=['Ramify','Rami']",
-        "docs": "node_modules/.bin/jsdoc -c jsdoc.json"
+        "docs": "node_modules/.bin/jsdoc -c jsdoc.conf.json"
     },
     "files": ["dist/ramify.min.js"],
     "repository": {
