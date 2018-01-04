@@ -19,6 +19,9 @@ Using [npm](https://www.npmjs.org/):
 npm install --save ramify
 
 var Ramify = require('ramify');
+// or
+import Ramify from 'ramify';
+
 var myController = new Ramify();
 ```
 
@@ -28,6 +31,7 @@ Using [Bower](http://bower.io/):
 bower install --save ramify
 
 <script src="dist/ramify.min.js"></script>
+
 <script type="text/javascript">
     var myController = new Ramify();
 </script>
