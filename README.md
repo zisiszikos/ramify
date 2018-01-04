@@ -27,7 +27,7 @@ Using [Bower](http://bower.io/):
 ```
 bower install --save ramify
 
-<script src="dist/ramify.js"></script>
+<script src="dist/ramify.min.js"></script>
 <script type="text/javascript">
     var myController = new Ramify();
 </script>
