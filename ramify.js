@@ -51,7 +51,8 @@
     var _generalErrorHandler = null;
     var _returnValue = null;
     var _config = {
-        createAlias: false
+        createAlias: false,
+        safeAlias: true
     };
     var _this = null;
     var _properties = {};
@@ -151,7 +152,7 @@
             var keysCount = Object.keys(this.config).length;
             for (var i = 0; i < keysCount; i++) {
                 var configName = Object.keys(this.config)[i];
-                if (config[configName] && typeof this.config[configName] === typeof config[configName]) {
+                if (typeof this.config[configName] === typeof config[configName]) {
                     this.config[configName] = config[configName];
                 }
             }
@@ -190,7 +191,12 @@
      * @memberof Ramify
      * @instance
      * @property {boolean} createAlias=false Whether alias methods should be
-     * created for every ramus, at the inner Rami object.
+     * created for every ramus, at the inner Rami object. **Note:** Alias methods
+     * are dangerous because calling a method that doesn't exists will result
+     * in an unhandled exception. Instead, the `.call` method handles this kind
+     * of errors.
+     * @property {boolean} safeAlias=true Whether alias methods should be
+     * prepended with an underscore for safety (not overwriting existing methods).
      */
     Ramify.prototype.config = _config;
 
@@ -219,8 +225,9 @@
                 var ramusName = Object.keys(rami)[i];
                 _rami[ramusName] = rami[ramusName];
                 if (this.config.createAlias) {
-                    Rami.prototype['_' + ramusName] = _call.bind(_this, ramusName);
-                    Ramify.prototype['_' + ramusName] = _call.bind(_this, ramusName);
+                    var properyName = this.config.safeAlias ? '_' + ramusName : ramusName;
+                    Rami.prototype[properyName] = _call.bind(_this, ramusName);
+                    Ramify.prototype[properyName] = _call.bind(_this, ramusName);
                 }
             }
         }
@@ -255,8 +262,9 @@
         _rami = _rami || {};
         _rami[ramusName] = ramusContent;
         if (this.config.createAlias) {
-            Rami.prototype['_' + ramusName] = _call.bind(_this, ramusName);
-            Ramify.prototype['_' + ramusName] = _call.bind(_this, ramusName);
+            var properyName = this.config.safeAlias ? '_' + ramusName : ramusName;
+            Rami.prototype[properyName] = _call.bind(_this, ramusName);
+            Ramify.prototype[properyName] = _call.bind(_this, ramusName);
         }
 
         return this;
