@@ -15,9 +15,10 @@ It supports both browser and Node.js environments. At a browser it exposes a glo
 
 Using [npm](https://www.npmjs.org/):
 
-```
+```shell
 npm install --save ramify
-
+```
+```javascript
 var Ramify = require('ramify');
 // or
 import Ramify from 'ramify';
@@ -27,9 +28,10 @@ var myController = new Ramify();
 
 Using [Bower](http://bower.io/):
 
-```
+```shell
 bower install --save ramify
-
+```
+```html
 <script src="dist/ramify.min.js"></script>
 
 <script type="text/javascript">
