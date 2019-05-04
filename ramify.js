@@ -165,7 +165,7 @@
      * @memberof Ramify
      * @static
      */
-    Ramify.version = '0.3.2';
+    Ramify.version = '0.4.0';
 
     /**
      * Returns the author of Ramify package.
@@ -197,6 +197,15 @@
      * of errors.
      * @property {boolean} safeAlias=true Whether alias methods should be
      * prepended with an underscore for safety (not overwriting existing methods).
+     * @example
+     * var myController = new Ramify({
+     *  createAlias: true,
+     *  safeAlias: false
+     * });
+     * myController.add(function aRamusName() {
+     *     // do something
+     * });
+     * myController.aRamusName();
      */
     Ramify.prototype.config = _config;
 
@@ -238,7 +247,7 @@
     /**
      * Adds a function to the Ramify instance that will be used within it.
      * @function Ramify#add
-     * @param {!string} ramusName The name of the ramus.
+     * @param {!string|function} ramusName The name of the ramus or the content function.
      * @param {*} [ramusContent] The content of the current ramus.
      * @returns {Ramify} The instance of current Ramify object.
      * @example
@@ -246,25 +255,36 @@
      * myController.add('aRamusName', function () {
      *     // do something
      * });
+     * myController.add(function aRamusName() {
+     *     // do something
+     * });
      * myController.add('anotherRamusName', 'someValue');
      * myController.add('someOtherRamusName');
      */
     Ramify.prototype.add = function(ramusName, ramusContent) {
-        if (!ramusName) {
-            if (typeof _generalErrorHandler === 'function') {
-                return _generalErrorHandler.call(this, new RamifyError('Ramus name is not specified.'));
-            } else {
-                throw new RamifyError('Ramus name is not specified.');
+        var name = null;
+        if (typeof ramusName === 'function') {
+            _rami = _rami || {};
+            name = ramusName.name;
+            _rami[name] = ramusName;
+        } else {
+            if (!ramusName) {
+                if (typeof _generalErrorHandler === 'function') {
+                    return _generalErrorHandler.call(this, new RamifyError('Ramus name is not specified.'));
+                } else {
+                    throw new RamifyError('Ramus name is not specified.');
+                }
+                return this;
             }
-            return this;
-        }
 
-        _rami = _rami || {};
-        _rami[ramusName] = ramusContent;
+            _rami = _rami || {};
+            name = ramusName;
+            _rami[name] = ramusContent;
+        }
         if (this.config.createAlias) {
-            var properyName = this.config.safeAlias ? '_' + ramusName : ramusName;
-            Rami.prototype[properyName] = _call.bind(_this, ramusName);
-            Ramify.prototype[properyName] = _call.bind(_this, ramusName);
+            var properyName = this.config.safeAlias ? '_' + name : name;
+            Rami.prototype[properyName] = _call.bind(_this, name);
+            Ramify.prototype[properyName] = _call.bind(_this, name);
         }
 
         return this;

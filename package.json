@@ -1,14 +1,15 @@
 {
     "name": "ramify",
-    "version": "0.3.2",
-    "description":
-        "Ramify is a lightweight library with zero dependencies which provides a simple way to create complex paths of functions and promises for easier handling the different scenarios that can happen in a chain of actions.",
+    "version": "0.4.0",
+    "description": "Ramify is a lightweight library with zero dependencies which provides a simple way to create complex paths of functions and promises for easier handling the different scenarios that can happen in a chain of actions.",
     "main": "ramify.js",
     "scripts": {
         "build": "node_modules/.bin/uglifyjs ramify.js -o dist/ramify.min.js -c -m reserved=['Ramify','Rami']",
         "docs": "node_modules/.bin/jsdoc -c jsdoc.conf.json"
     },
-    "files": ["dist/ramify.min.js"],
+    "files": [
+        "dist/ramify.min.js"
+    ],
     "repository": {
         "type": "git",
         "url": "https://github.com/zisiszikos/ramify.git"
