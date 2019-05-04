@@ -165,7 +165,7 @@
      * @memberof Ramify
      * @static
      */
-    Ramify.version = '0.3.2';
+    Ramify.version = '0.4.0';
 
     /**
      * Returns the author of Ramify package.
